@@ -1,0 +1,108 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title"
+          charset="utf-8">
+    <link rel="stylesheet" href="{% static 'css/myinfo.css' %}" media="screen" title="no title">
+    <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway" rel="stylesheet">
+
+</head>
+<body>
+<div class="ui inverted top fixed menu borderless red menu">
+    <div class="header item">
+        <div class="ui image">
+            <img src="{% static 'images/tenlogo.png' %}" alt="">
+        </div>
+    </div>
+
+    <div class="right menu">
+        {% if request.user.is_authenticated %}
+            <div class="item">
+                <h5 class="ui inverted header">
+
+                    <div class="ui mini circular image">
+                        <img src="/media/{{ request.user.profile.avatar }}" alt="" style="height: 35px;width: 35px;">
+                    </div>
+
+                    <span>{{ request.user.username }}</span>
+                </h5>
+            </div>
+            <div class="item">
+                <a href="{% url 'logout' %}" class="ui inverted circular button">Logout</a>
+            </div>
+        {% else %}
+            <div class="item">
+                <a href="{% url 'login' %}" class="ui inverted circular button">Signup/Login</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<div class="ui  raised container segments">
+    <div class="ui head basic segment" style="background-image: url({% static 'images/bg.png' %});">
+    </div>
+    <div class="ui bottom inverted  six item attached menu">
+
+        <div class="item">
+            <a href="{% url 'myinfo' %}">个人资料</a>
+        </div>
+        <div class="active item">
+            我赞过的
+        </div>
+    </div>
+
+    <div class="ui butt segment">
+        <div class="ui basic very padded segment container info" style="width:530px;">
+
+            {% for ticket in ticket_list %}
+                <img class="ui top aligned tiny image" src="{% static  ticket.article.img %}"
+                     style="width:80px;height:55px;">
+                <span><a href="{% url 'detail' ticket.article.id %}"
+                         style="color: black;">{{ ticket.article.title |truncatechars:'25' }}</a></span>
+                <div class="ui divider"></div>
+            {% endfor %}
+
+        </div>
+        <div class="ui center aligned very padded vertical segment container" style="padding-top: 2%;">
+            <div class="ui pagination menu">
+                {% if ticket_list.has_previous %}
+                    <a href="?page={{ ticket_list.previous_page_number }}" class="item">
+                        <i class="icon red left arrow"></i>
+                    </a>
+                {% else %}
+                    <a href="?page={{ ticket_list.start_index }}" class="disabled item">
+                        <i class="icon left arrow"></i>
+                    </a>
+                {% endif %}
+
+                {% for page_number in ticket_list.paginator.page_range %}
+                    {% ifequal page_number  ticket_list.number %}
+                        <a href="?page={{ page_number }}" class="active item"
+                           style="background-color: red; color:white">
+                            {{ page_number }}
+                        </a>
+                    {% else %}
+                        <a href="?page={{ page_number }}" class=" item">
+                            {{ page_number }}
+                        </a>
+                    {% endifequal %}
+                {% endfor %}
+
+                {% if  ticket_list.has_next %}
+                    <a href="?page={{ ticket_list.next_page_number }}" class="item">
+                        <i class="icon red right arrow"></i>
+                    </a>
+                {% else %}
+                    <a href="?page={{ ticket_list.paginator.num_pages }}" class="disabled item">
+                        <i class="icon right arrow"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
